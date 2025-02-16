@@ -1,0 +1,61 @@
+name: build
+on:
+  workflow_dispatch: {}
+jobs:
+  build:
+    name: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [windows]
+        include:
+        - build: windows
+          os: windows-2019
+          rust: nightly-x86_64-msvc
+          target: x86_64-pc-windows-msvc
+          archive-name: NodeInject-windows.7z
+      fail-fast: false
+
+    steps:
+    - name: Checkout Node
+      uses: actions/checkout@v2
+      with:
+        path: './Node'
+    - name: Checkout License-learning 
+      uses: actions/checkout@v2
+      with:
+          path: './License-learning '
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
+        profile: minimal
+        override: true
+        target: ${{ matrix.target }}
+
+    - name: Build binary
+      shell: bash
+      run: |
+        cd ./License-learning
+        cargo build --verbose --release --target ${{ matrix.target }}
+        cd ./Node
+        cargo build --verbose --release --target ${{ matrix.target }}
+        cd ../
+      env:
+        RUST_BACKTRACE: 1
+
+    - name: Build archive
+      shell: bash
+      run: |
+        mkdir archive
+        ls -lR
+        cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
+        cp "./License-learning/target/${{ matrix.target }}/release/license-gen.exe" ./archive/
+        cd archive
+        7z a "${{ matrix.archive-name }}" node_inject.exe license-gen.exe
+
+    - name: Upload archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: ${{ matrix.archive-name }}
+        path: archive/${{ matrix.archive-name }}
