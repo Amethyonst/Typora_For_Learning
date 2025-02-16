@@ -54,7 +54,7 @@ jobs:
         cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
         cp "./License-learning/target/${{ matrix.target }}/release/license-learning.exe" ./archive/
         cd archive
-        7z a "${{ matrix.archive-name }}" node_inject.exe license-gen.exe
+        7z a "${{ matrix.archive-name }}" node_inject.exe license-learning.exe
 
     - name: Upload archive
       uses: actions/upload-artifact@v4
