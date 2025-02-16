@@ -55,7 +55,7 @@ jobs:
         7z a "${{ matrix.archive-name }}" node_inject.exe license-gen.exe
 
     - name: Upload archive
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.archive-name }}
         path: archive/${{ matrix.archive-name }}
