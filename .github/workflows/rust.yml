@@ -18,11 +18,11 @@ jobs:
 
     steps:
     - name: Checkout Node
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: './Node'
     - name: Checkout License-learning 
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
           path: './License-learning '
     - name: Install Rust
