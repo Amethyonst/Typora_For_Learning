@@ -48,8 +48,9 @@ jobs:
     - name: Build archive
       shell: bash
       run: |
+        pwd
         mkdir archive
-        ls -lR
+        ls -la
         cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
         cp "./License-learning/target/${{ matrix.target }}/release/license-gen.exe" ./archive/
         cd archive
