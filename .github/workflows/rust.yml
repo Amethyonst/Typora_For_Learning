@@ -38,6 +38,7 @@ jobs:
       run: |
         cd ./License-learning
         cargo build --verbose --release --target ${{ matrix.target }}
+        cd ../
         cd ./Node
         cargo build --verbose --release --target ${{ matrix.target }}
         cd ../
