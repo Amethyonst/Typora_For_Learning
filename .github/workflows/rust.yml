@@ -45,8 +45,8 @@ jobs:
       - name: Prepare Archive
         shell: bash
         run: |
-          ls -la
           mkdir -p archive
+          ls -lr
           for project in Node License-learning; do
             binary_name=$(echo $project | tr '[:upper:]' '[:lower:]' | tr '-' '_')
             cp "./$project/target/${{ matrix.target }}/release/$binary_name.exe" ./archive/
