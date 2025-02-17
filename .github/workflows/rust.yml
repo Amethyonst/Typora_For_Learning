@@ -1,72 +1,63 @@
 name: build
-
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+  workflow_dispatch: {}
 jobs:
   build:
+    name: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        rust: [stable]
-        target: 
-          - x86_64-unknown-linux-gnu  # Linux 目标
-          - x86_64-pc-windows-msvc    # Windows 目标
-          - x86_64-apple-darwin       # macOS 目标
+        build: [windows]
         include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            archive-name: release-linux.zip
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            archive-name: release-windows.zip
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            archive-name: release-macos.zip
+        - build: windows
+          os: windows-2019
+          rust: nightly-x86_64-msvc
+          target: x86_64-pc-windows-msvc
+          archive-name: NodeInject-windows.7z
+      fail-fast: false
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout Node
+      uses: actions/checkout@v4
+      with:
+        path: './'
+    - name: Checkout License-learning 
+      uses: actions/checkout@v4
+      with:
+          path: './ '
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
+        profile: minimal
+        override: true
+        target: ${{ matrix.target }}
 
-      - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          rust-version: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
+    - name: Build binary
+      shell: bash
+      run: |
+        cd ./License-learning
+        cargo build --verbose --release --target ${{ matrix.target }}
+        cd ../
+        cd ./Node
+        cargo build --verbose --release --target ${{ matrix.target }}
+        cd ../
+      env:
+        RUST_BACKTRACE: 1
 
-      - name: Build binary
-        shell: pwsh
-        run: |
-          cd ./License-learning
-          cargo build --verbose --release --target ${{ matrix.target }}
-          cd ../
-          cd ./Node
-          cargo build --verbose --release --target ${{ matrix.target }}
-          cd ../
-        env:
-          RUST_BACKTRACE: 1
+    - name: Build archive
+      shell: bash
+      run: |
+        pwd
+        mkdir archive
+        ls -la
+        cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
+        cp "./License-learning/target/${{ matrix.target }}/release/license-learning.exe" ./archive/
+        cd archive
+        7z a "${{ matrix.archive-name }}" node_inject.exe license-learning.exe
 
-      - name: Build archive
-        shell: pwsh
-        run: |
-          mkdir -p archive
-          if ("${{ runner.os }}" -eq "Windows") {
-            cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
-            cp "./License-learning/target/${{ matrix.target }}/release/license-learning.exe" ./archive/
-          } else {
-            cp "./Node/target/${{ matrix.target }}/release/node_inject" ./archive/
-            cp "./License-learning/target/${{ matrix.target }}/release/license-learning" ./archive/
-          }
-          cd archive
-          zip "${{ matrix.archive-name }}" *
-
-      - name: Upload archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.archive-name }}
-          path: archive/${{ matrix.archive-name }}
+    - name: Upload archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.archive-name }}
+        path: archive/${{ matrix.archive-name }}
