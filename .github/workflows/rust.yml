@@ -22,15 +22,15 @@ jobs:
             bin_ext: ""
 
           - platform: macos
-            os: macos-latest
+            os: macos-l3
             rust_toolchain: stable-x86_64-apple-darwin
             target: x86_64-apple-darwin
             bin_ext: ""
 
           - platform: macos
             os: macos-latest
-            rust_toolchain: stable-arm64-apple-darwin
-            target: arm64-apple-darwin
+            rust_toolchain: stable-aarch64-apple-darwin
+            target: aarch64-apple-darwin
             bin_ext: ""
       fail-fast: false
 
