@@ -74,7 +74,7 @@ jobs:
           mkdir -p artifacts
           ls -R
           for project in Node License_learning; do
-            bin_name=$(echo $project | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+            bin_name=$(echo $project )
             cp "src/$project/target/${{ matrix.target }}/release/$bin_name${{ matrix.bin_ext}}" \
               artifacts/
           done
