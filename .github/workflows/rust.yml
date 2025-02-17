@@ -11,7 +11,7 @@ jobs:
         include:
           - platform: windows
             os: windows-latest
-            rust_toolchain: nightly-x86_64-msvc
+            rust_toolchain: stable-x86_64-msvc
             target: x86_64-pc-windows-msvc
             bin_ext: .exe
 
@@ -22,7 +22,7 @@ jobs:
             bin_ext: ""
 
           - platform: macos
-            os: macos-12
+            os: macos-latest
             rust_toolchain: stable-x86_64-apple-darwin
             target: x86_64-apple-darwin
             bin_ext: ""
@@ -72,6 +72,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
+          ls -lr
           for project in Node License_learning; do
             bin_name=$(echo $project | tr '[:upper:]' '[:lower:]' | tr '-' '_')
             cp "src/$project/target/${{ matrix.target }}/release/$bin_name${{ matrix.bin_ext}}" \
