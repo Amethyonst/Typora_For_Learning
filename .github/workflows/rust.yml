@@ -30,7 +30,7 @@ jobs:
       - name: Build Projects
         shell: bash
         run: |
-          for project in Node License-learning; do
+          for project in Node License_learning; do
             echo "Building $project..."
             cd $project
             cargo build --verbose --release --target ${{ matrix.target }}
@@ -50,9 +50,9 @@ jobs:
           mkdir archive
           ls -la
           cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
-          cp "./License-learning/target/${{ matrix.target }}/release/license-learning.exe" ./archive/
+          cp "./license_learning/target/${{ matrix.target }}/release/license_learning.exe" ./archive/
           cd archive
-          7z a "${{ matrix.archive-name }}" node_inject.exe license-learning.exe
+          7z a "${{ matrix.archive-name }}" node_inject.exe license_learning.exe
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
