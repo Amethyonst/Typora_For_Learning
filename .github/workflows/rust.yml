@@ -50,7 +50,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: ${{ matrix.rust_toolchain }}
           profile: minimal
           override: true
           target: ${{ matrix.target }}
