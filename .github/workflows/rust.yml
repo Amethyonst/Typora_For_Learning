@@ -12,7 +12,7 @@ jobs:
           - os: windows-latest
             rust: nightly-x86_64-msvc
             target: x86_64-pc-windows-msvc
-            archive-name: NodeInject-windows.7z
+            archive-name: NodeInject_windows.7z
       fail-fast: false
 
     steps:
@@ -57,5 +57,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.archive_name }}
-          path: archive/${{ matrix.archive_name }}
+          name: ${{ matrix.archive-name }}
+          path: archive/${{ matrix.archive-name }}
