@@ -14,24 +14,28 @@ jobs:
             rust_toolchain: stable-x86_64-msvc
             target: x86_64-pc-windows-msvc
             bin_ext: .exe
+            arch: x86_64
 
           - platform: linux
             os: ubuntu-latest
             rust_toolchain: stable-x86_64-unknown-linux-gnu
             target: x86_64-unknown-linux-gnu
             bin_ext: ""
+            arch: x86_64
 
           - platform: macos
-            os: macos-l3
+            os: macos-13
             rust_toolchain: stable-x86_64-apple-darwin
             target: x86_64-apple-darwin
             bin_ext: ""
+            arch: x86_64
 
           - platform: macos
             os: macos-latest
             rust_toolchain: stable-aarch64-apple-darwin
             target: aarch64-apple-darwin
             bin_ext: ""
+            arch: aarch64
       fail-fast: false
 
     steps:
@@ -88,16 +92,15 @@ jobs:
           # 统一使用 zip 打包
           case "${{ matrix.platform }}" in
             windows)
-              7z a -tzip "artifacts/ject-${{ matrix.platform }}.zip" ./artifacts/*
+              7z a -tzip "artifacts/Inject-${{ matrix.platform }}-${{ matrix.arch }}.zip" ./artifacts/*
               ;;
             *)
-              zip -r "artifacts/Inject-${{ matrix.platform }}.zip" ./artifacts/*
+              zip -r "artifacts/Inject-${{ matrix.platform }}-${{ matrix.arch }}.zip" ./artifacts/*
               ;;
           esac
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Inject-${{ matrix.platform }}
-          path: artifacts/Inject-${{ matrix.platform }}.zip
-  
+          name: Inject-${{ matrix.platform }}-${{ matrix.arch }}
+          path: artifacts/Inject-${{ matrix.platform }}-${{ matrix.arch }}.zip
