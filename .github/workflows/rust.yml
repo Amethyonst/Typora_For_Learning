@@ -9,10 +9,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: windows-2019
+          - os: windows-latest
             rust: nightly-x86_64-msvc
             target: x86_64-pc-windows-msvc
-            archive_name: NodeInject-windows.7z
       fail-fast: false
 
     steps:
@@ -46,6 +45,7 @@ jobs:
       - name: Prepare Archive
         shell: bash
         run: |
+          ls -la
           mkdir -p archive
           for project in Node License-learning; do
             binary_name=$(echo $project | tr '[:upper:]' '[:lower:]' | tr '-' '_')
