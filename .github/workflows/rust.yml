@@ -1,4 +1,4 @@
-name: build
+name: Build and Package
 on:
   workflow_dispatch: {}
 
@@ -9,21 +9,20 @@ jobs:
 
     strategy:
       matrix:
-        rust: [nightly-x86_64-msvc]
+        rust: [stable]
         target: [x86_64-pc-windows-msvc]
-        archive-name: [NodeInject-windows.zip]
-
+        
     steps:
     - name: Checkout Repositories
       uses: actions/checkout@v4
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
       with:
-        toolchain: ${{ matrix.rust }}
+        path: './'
+        
+    - name: Set up Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
         profile: minimal
-        override: true
-        target: ${{ matrix.target }}
+        default: true
         
     - name: Build Binaries and Archive
       shell: bash
