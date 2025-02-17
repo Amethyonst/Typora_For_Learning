@@ -5,45 +5,57 @@ on:
 jobs:
   build:
     name: Build and Package
-    runs-on: windows-2019
-
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        rust: [stable]
-        target: [x86_64-pc-windows-msvc]
-        
+        include:
+          - os: windows-2019
+            rust: nightly-x86_64-msvc
+            target: x86_64-pc-windows-msvc
+            archive_name: NodeInject-windows.7z
+      fail-fast: false
+
     steps:
-    - name: Checkout Repositories
-      uses: actions/checkout@v4
-      with:
-        path: './'
-        
-    - name: Set up Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        profile: minimal
-        default: true
-        
-    - name: Build Binaries and Archive
-      shell: bash
-      run: |
-        # Build License-learning
-        cd ./License-learning
-        cargo build --verbose --release --target ${{ matrix.target }}
-        # Build Node
-        cd ../Node
-        cargo build --verbose --release --target ${{ matrix.target }}
-        # Prepare Archive (ZIP)
-        mkdir -p archive
-        cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
-        cp "./License-learning/target/${{ matrix.target }}/release/license-learning.exe" ./archive/
-        cd archive
-        zip -r "${{ matrix.archive-name }}" ./*
-      env:
-        RUST_BACKTRACE: 1
-        
-    - name: Upload Archive
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.archive-name }}
-        path: archive/${{ matrix.archive-name }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - name: Build Projects
+        shell: bash
+        run: |
+          for project in Node License-learning; do
+            echo "Building $project..."
+            cd $project
+            cargo build --verbose --release --target ${{ matrix.target }}
+            if [ $? -ne 0 ]; then
+              echo "Failed to build $project"
+              exit 1
+            fi
+            cd ..
+          done
+        env:
+          RUST_BACKTRACE: 1
+
+      - name: Prepare Archive
+        shell: bash
+        run: |
+          mkdir -p archive
+          for project in Node License-learning; do
+            binary_name=$(echo $project | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+            cp "./$project/target/${{ matrix.target }}/release/$binary_name.exe" ./archive/
+          done
+          cd archive
+          7z a "${{ matrix.archive_name }}" *.exe
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive_name }}
+          path: archive/${{ matrix.archive_name }}
