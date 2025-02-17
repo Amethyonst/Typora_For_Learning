@@ -1,30 +1,22 @@
 name: build
 on:
   workflow_dispatch: {}
+
 jobs:
   build:
-    name: build
-    runs-on: ${{ matrix.os }}
+    name: Build and Package
+    runs-on: windows-2019
+
     strategy:
       matrix:
-        build: [windows]
-        include:
-        - build: windows
-          os: windows-2019
-          rust: nightly-x86_64-msvc
-          target: x86_64-pc-windows-msvc
-          archive-name: NodeInject-windows.7z
-      fail-fast: false
+        rust: [nightly-x86_64-msvc]
+        target: [x86_64-pc-windows-msvc]
+        archive-name: [NodeInject-windows.zip]
 
     steps:
-    - name: Checkout Node
+    - name: Checkout Repositories
       uses: actions/checkout@v4
-      with:
-        path: './'
-    - name: Checkout License-learning 
-      uses: actions/checkout@v4
-      with:
-          path: './ '
+
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -32,31 +24,26 @@ jobs:
         profile: minimal
         override: true
         target: ${{ matrix.target }}
-
-    - name: Build binary
+        
+    - name: Build Binaries and Archive
       shell: bash
       run: |
+        # Build License-learning
         cd ./License-learning
         cargo build --verbose --release --target ${{ matrix.target }}
-        cd ../
-        cd ./Node
+        # Build Node
+        cd ../Node
         cargo build --verbose --release --target ${{ matrix.target }}
-        cd ../
-      env:
-        RUST_BACKTRACE: 1
-
-    - name: Build archive
-      shell: bash
-      run: |
-        pwd
-        mkdir archive
-        ls -la
+        # Prepare Archive (ZIP)
+        mkdir -p archive
         cp "./Node/target/${{ matrix.target }}/release/node_inject.exe" ./archive/
         cp "./License-learning/target/${{ matrix.target }}/release/license-learning.exe" ./archive/
         cd archive
-        7z a "${{ matrix.archive-name }}" node_inject.exe license-learning.exe
-
-    - name: Upload archive
+        zip -r "${{ matrix.archive-name }}" ./*
+      env:
+        RUST_BACKTRACE: 1
+        
+    - name: Upload Archive
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.archive-name }}
