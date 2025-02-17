@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          ls -lr
+          ls -R
           for project in Node License_learning; do
             bin_name=$(echo $project | tr '[:upper:]' '[:lower:]' | tr '-' '_')
             cp "src/$project/target/${{ matrix.target }}/release/$bin_name${{ matrix.bin_ext}}" \
